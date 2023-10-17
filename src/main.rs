@@ -14,11 +14,15 @@ async fn main() {
     let elapsed = now.elapsed();
     println!("✅ Loaded .env file in {:?}", elapsed);
 
+    log_memory_usage();
+
     let now = Instant::now();
     let fortnite_io_api_key = env::var("FORTNITE_IO_API_KEY").expect("FORTNITE_IO_API_KEY not set");
     let fortnite_api_io = fortnite_api_io::FortniteApiIo::new(fortnite_io_api_key);
     let elapsed = now.elapsed();
     println!("✅ Created FortniteApiIo struct in {:?}", elapsed);
+
+    log_memory_usage();
 
     let now = Instant::now();
     let items = fortnite_api_io
@@ -28,10 +32,14 @@ async fn main() {
     let elapsed = now.elapsed();
     println!("✅ Got {} items list in {:?}", { &items.len() }, elapsed);
 
+    log_memory_usage();
+
     let now = Instant::now();
     let mut fortnite_api = fortnite_api::FortniteAPI::new();
     let elapsed = now.elapsed();
     println!("✅ Created FortniteAPI struct in {:?}", elapsed);
+
+    log_memory_usage();
 
     let now = Instant::now();
     if fortnite_api.session.is_none() {
@@ -43,6 +51,8 @@ async fn main() {
         fortnite_api.session.as_ref().unwrap().display_name,
         elapsed
     );
+
+    log_memory_usage();
 
     let now = Instant::now();
     let _athena_profile = fortnite_api
