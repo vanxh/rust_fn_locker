@@ -6,6 +6,7 @@ use models::session::Session;
 use serde_json;
 use std::fs::{self, File};
 use std::io::{self, Write};
+use std::time::Instant;
 
 pub struct FortniteAPI {
     pub session: Option<Session>,
@@ -28,9 +29,12 @@ impl FortniteAPI {
 
     pub fn save_session(&self) -> io::Result<()> {
         if let Some(session) = &self.session {
+            let now = Instant::now();
             let data = serde_json::to_string(session)?;
             let mut file = File::create("session.json")?;
             file.write_all(data.as_bytes())?;
+            let elapsed = now.elapsed();
+            println!("✅ Saved session in {:?}", elapsed);
         }
         Ok(())
     }
