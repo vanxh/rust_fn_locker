@@ -40,6 +40,14 @@ async fn main() {
         fortnite_api.session.as_ref().unwrap().display_name,
         elapsed
     );
+
+    let now = Instant::now();
+    let _athena_profile = fortnite_api
+        .get_athena_profile()
+        .await
+        .expect("❌ Failed to get athena profile");
+    let elapsed = now.elapsed();
+    println!("✅ Got athena profile in {:?}", elapsed);
 }
 
 async fn fortnite_login(fortnite_api: &mut fortnite_api::FortniteAPI) {

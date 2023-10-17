@@ -1,5 +1,6 @@
 mod models;
 
+use models::athena_profile::GetAthenaProfileResponse;
 use models::auth_token::GetAccessTokenResponse;
 use models::device_authorization::GetDeviceAuthorizationResponse;
 use models::session::Session;
@@ -91,6 +92,27 @@ impl FortniteAPI {
             .send()
             .await?
             .json::<GetDeviceAuthorizationResponse>()
+            .await?;
+
+        Ok(resp)
+    }
+
+    pub async fn get_athena_profile(
+        &self,
+    ) -> Result<GetAthenaProfileResponse, Box<dyn std::error::Error>> {
+        let session = self.session.as_ref().unwrap();
+        let url = format!("https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/profile/{}/client/QueryProfile?profileId=athena", session.account_id);
+
+        let client = reqwest::Client::new();
+
+        let resp = client
+            .post(url)
+            .header("Content-Type", "application/json")
+            .bearer_auth(session.access_token.clone())
+            .json(&serde_json::json!({}))
+            .send()
+            .await?
+            .json::<GetAthenaProfileResponse>()
             .await?;
 
         Ok(resp)
