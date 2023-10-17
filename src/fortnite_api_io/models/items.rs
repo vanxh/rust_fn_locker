@@ -10,16 +10,15 @@ pub struct GetItemsResponse {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Item {
-    id: String,
+    pub id: String,
     #[serde(rename = "type")]
-    item_type: ItemType,
-    name: String,
-    description: String,
-    rarity: Rarity,
-    series: Box<Option<Series>>,
-    price: u16,
+    pub item_type: ItemType,
+    pub name: String,
+    pub rarity: Rarity,
+    pub series: Box<Option<Series>>,
+    pub price: u16,
     #[serde(rename = "images")]
-    icon: Images,
+    pub icon: Images,
 }
 
 #[derive(Serialize, Debug)]
@@ -203,7 +202,7 @@ struct Added {
 }
 
 #[derive(Serialize, Debug)]
-struct Images {
+pub struct Images {
     icon: Option<String>,
 }
 

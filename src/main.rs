@@ -63,6 +63,35 @@ async fn main() {
     println!("✅ Got athena profile in {:?}", elapsed);
 
     log_memory_usage();
+
+    let owned_outfits = _athena_profile.profile_changes[0]
+        .profile
+        .items
+        .iter()
+        .filter(|item| item.1.template_id.starts_with("AthenaCharacter"))
+        .map(|item| {
+            item.1
+                .template_id
+                .clone()
+                .to_lowercase()
+                .split(":")
+                .collect::<Vec<&str>>()[1]
+                .to_string()
+        })
+        .collect::<Vec<String>>();
+
+    let items = items
+        .iter()
+        .filter(|item| owned_outfits.contains(&item.id.to_lowercase()))
+        .collect::<Vec<&fortnite_api_io::models::items::Item>>();
+
+    println!(
+        "✅ Got {} owned outfits in {:?}",
+        items.len(),
+        now.elapsed()
+    );
+
+    log_memory_usage();
 }
 
 async fn fortnite_login(fortnite_api: &mut fortnite_api::FortniteAPI) {

@@ -1,4 +1,4 @@
-mod models;
+pub mod models;
 
 use models::items::{GetItemsResponse, Item};
 
