@@ -26,31 +26,61 @@ async fn main() {
     println!("✅ Got {} items list in {:?}", { &items.len() }, elapsed);
 
     let now = Instant::now();
-    let fortnite_api = fortnite_api::FortniteAPI::new();
+    let mut fortnite_api = fortnite_api::FortniteAPI::new();
     let elapsed = now.elapsed();
     println!("✅ Created FortniteAPI struct in {:?}", elapsed);
 
     let now = Instant::now();
-    fortnite_login(&fortnite_api).await;
+    if fortnite_api.session.is_none() {
+        fortnite_login(&mut fortnite_api).await;
+    }
     let elapsed = now.elapsed();
-    println!("✅ Logged in to Fortnite in {:?}", elapsed);
+    println!(
+        "✅ Logged in to Fortnite as {} in {:?}",
+        fortnite_api.session.as_ref().unwrap().display_name,
+        elapsed
+    );
 }
 
-async fn fortnite_login(fortnite_api: &fortnite_api::FortniteAPI) {
+async fn fortnite_login(fortnite_api: &mut fortnite_api::FortniteAPI) {
     let switch_token = "OThmN2U0MmMyZTNhNGY4NmE3NGViNDNmYmI0MWVkMzk6MGEyNDQ5YTItMDAxYS00NTFlLWFmZWMtM2U4MTI5MDFjNGQ3";
 
     let client_token = fortnite_api
-        .get_auth_token(switch_token, "grant_type=client_credentials")
+        .get_auth_token(&switch_token, "grant_type=client_credentials", false)
         .await
         .expect("❌ Failed to get client token");
 
+    let start = Instant::now();
     let device_authorization = fortnite_api
         .get_device_authorization(&client_token, "prompt=login")
         .await
         .expect("❌ Failed to get device authorization");
 
     println!(
-        "Visit {} and authorize your account",
+        "🚀 Visit {} and authorize your account",
         &device_authorization.verification_uri_complete,
     );
+
+    println!("⏳ Waiting for authorization...");
+    while start.elapsed().as_secs() < device_authorization.expires_in.into() {
+        let body = format!(
+            "grant_type=device_code&device_code={}&token_type=eg1",
+            &device_authorization.device_code
+        );
+
+        let result = fortnite_api
+            .get_auth_token(&switch_token, &body.as_str(), true)
+            .await;
+
+        if let Ok(access_token) = result {
+            if access_token != "" {
+                break;
+            }
+        }
+
+        tokio::time::sleep(tokio::time::Duration::from_secs(
+            device_authorization.interval.into(),
+        ))
+        .await;
+    }
 }

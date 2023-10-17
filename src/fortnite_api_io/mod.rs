@@ -1,4 +1,5 @@
 mod models;
+
 use models::items::{GetItemsResponse, Item};
 
 pub struct FortniteApiIo {
