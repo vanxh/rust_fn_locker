@@ -9,62 +9,58 @@ mod fortnite_api_io;
 async fn main() {
     log_memory_usage();
 
-    let now = Instant::now();
+    let start = Instant::now();
     dotenvy::dotenv().expect("❌ Failed to read .env file");
-    let elapsed = now.elapsed();
-    println!("✅ Loaded .env file in {:?}", elapsed);
+    log_elapsed_time("Loaded .env file", start);
 
     log_memory_usage();
 
-    let now = Instant::now();
+    let start = Instant::now();
     let fortnite_io_api_key = env::var("FORTNITE_IO_API_KEY").expect("FORTNITE_IO_API_KEY not set");
     let fortnite_api_io = fortnite_api_io::FortniteApiIo::new(fortnite_io_api_key);
-    let elapsed = now.elapsed();
-    println!("✅ Created FortniteApiIo struct in {:?}", elapsed);
+    log_elapsed_time("Created FortniteApiIo struct", start);
 
     log_memory_usage();
 
-    let now = Instant::now();
-    let items = fortnite_api_io
-        .get_items("/v2/items/list")
-        .await
-        .expect("❌ Failed to get items list");
-    let elapsed = now.elapsed();
-    println!("✅ Got {} items list in {:?}", { &items.len() }, elapsed);
+    let start = Instant::now();
+    let items = match fortnite_api_io.get_items("/v2/items/list").await {
+        Ok(items) => items,
+        Err(err) => panic!("❌ Failed to get items list: {:?}", err),
+    };
+    log_elapsed_time(&format!("Got {} items list", { &items.len() }), start);
 
     log_memory_usage();
 
-    let now = Instant::now();
+    let start = Instant::now();
     let mut fortnite_api = fortnite_api::FortniteAPI::new();
-    let elapsed = now.elapsed();
-    println!("✅ Created FortniteAPI struct in {:?}", elapsed);
+    log_elapsed_time("Created FortniteAPI struct", start);
 
     log_memory_usage();
 
-    let now = Instant::now();
+    let start = Instant::now();
     if fortnite_api.session.is_none() {
         fortnite_login(&mut fortnite_api).await;
     }
-    let elapsed = now.elapsed();
-    println!(
-        "✅ Logged in to Fortnite as {} in {:?}",
-        fortnite_api.session.as_ref().unwrap().display_name,
-        elapsed
+    log_elapsed_time(
+        &format!(
+            "Logged in to Fortnite as {}",
+            fortnite_api.session.as_ref().unwrap().display_name
+        ),
+        start,
     );
 
     log_memory_usage();
 
-    let now = Instant::now();
-    let _athena_profile = fortnite_api
-        .get_athena_profile()
-        .await
-        .expect("❌ Failed to get athena profile");
-    let elapsed = now.elapsed();
-    println!("✅ Got athena profile in {:?}", elapsed);
+    let start = Instant::now();
+    let athena_profile = match fortnite_api.get_athena_profile().await {
+        Ok(profile) => profile,
+        Err(err) => panic!("❌ Failed to get athena profile: {:?}", err),
+    };
+    log_elapsed_time("Got athena profile", start);
 
     log_memory_usage();
 
-    let owned_outfits = _athena_profile.profile_changes[0]
+    let owned_outfits = athena_profile.profile_changes[0]
         .profile
         .items
         .iter()
@@ -85,11 +81,7 @@ async fn main() {
         .filter(|item| owned_outfits.contains(&item.id.to_lowercase()))
         .collect::<Vec<&fortnite_api_io::models::items::Item>>();
 
-    println!(
-        "✅ Got {} owned outfits in {:?}",
-        items.len(),
-        now.elapsed()
-    );
+    log_elapsed_time(&format!("Got {} owned outfits", items.len()), start);
 
     log_memory_usage();
 }
@@ -144,4 +136,9 @@ fn log_memory_usage() {
         "🤯 Current process memory usage: {} MB",
         memory_info.rss() / 1024 / 1024
     );
+}
+
+fn log_elapsed_time(message: &str, start_time: Instant) {
+    let elapsed = start_time.elapsed();
+    println!("✅ {} in {:?}", message, elapsed);
 }
