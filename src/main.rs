@@ -1,11 +1,14 @@
 use std::env;
 use std::time::Instant;
+extern crate psutil;
 
 mod fortnite_api;
 mod fortnite_api_io;
 
 #[tokio::main]
 async fn main() {
+    log_memory_usage();
+
     let now = Instant::now();
     dotenvy::dotenv().expect("❌ Failed to read .env file");
     let elapsed = now.elapsed();
@@ -48,6 +51,8 @@ async fn main() {
         .expect("❌ Failed to get athena profile");
     let elapsed = now.elapsed();
     println!("✅ Got athena profile in {:?}", elapsed);
+
+    log_memory_usage();
 }
 
 async fn fortnite_login(fortnite_api: &mut fortnite_api::FortniteAPI) {
@@ -91,4 +96,13 @@ async fn fortnite_login(fortnite_api: &mut fortnite_api::FortniteAPI) {
         ))
         .await;
     }
+}
+
+fn log_memory_usage() {
+    let process = psutil::process::Process::current().unwrap();
+    let memory_info = process.memory_info().unwrap();
+    println!(
+        "🤯 Current process memory usage: {} MB",
+        memory_info.rss() / 1024 / 1024
+    );
 }
