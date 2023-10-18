@@ -1,4 +1,4 @@
 /target
 .env
-session.json
 .DS_Store
+/.rust_fn_locker

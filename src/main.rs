@@ -1,5 +1,7 @@
 use std::collections::HashSet;
 use std::env;
+use std::fs;
+use std::path::Path;
 use std::time::Instant;
 extern crate psutil;
 
@@ -8,6 +10,10 @@ mod fortnite_api_io;
 
 #[tokio::main]
 async fn main() {
+    let start = Instant::now();
+    create_cache_dir().expect("❌ Failed to create cache directory");
+    log_elapsed_time("Created cache directory", start);
+
     let start = Instant::now();
     dotenvy::dotenv().expect("❌ Failed to read .env file");
     log_elapsed_time("Loaded .env file", start);
@@ -129,6 +135,16 @@ async fn get_locker(
     log_elapsed_time("Parsed locker", start);
 
     items
+}
+
+fn create_cache_dir() -> std::io::Result<()> {
+    let dir_path = Path::new(".rust_fn_locker");
+
+    if !dir_path.exists() {
+        fs::create_dir(dir_path)?;
+    }
+
+    Ok(())
 }
 
 fn get_memory_usage() -> u64 {

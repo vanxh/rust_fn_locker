@@ -16,7 +16,7 @@ pub struct FortniteAPI {
 
 impl FortniteAPI {
     pub fn new() -> Self {
-        if let Ok(data) = fs::read_to_string("session.json") {
+        if let Ok(data) = fs::read_to_string(".rust_fn_locker/session.json") {
             if let Ok(session) = serde_json::from_str::<Session>(&data) {
                 if !session.is_expired() {
                     return FortniteAPI {
@@ -37,7 +37,7 @@ impl FortniteAPI {
         if let Some(session) = &self.session {
             let now = Instant::now();
             let data = serde_json::to_string(session)?;
-            let mut file = File::create("session.json")?;
+            let mut file = File::create(".rust_fn_locker/session.json")?;
             file.write_all(data.as_bytes())?;
             let elapsed = now.elapsed();
             println!("✅ Saved session in {:?}", elapsed);
