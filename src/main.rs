@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::env;
 use std::time::Instant;
 extern crate psutil;
@@ -98,26 +99,34 @@ async fn get_locker(
     };
     log_elapsed_time("Got athena profile", start);
 
-    let owned_outfits = athena_profile.profile_changes[0]
+    let start = Instant::now();
+
+    let owned_outfits: HashSet<String> = athena_profile.profile_changes[0]
         .profile
         .items
         .iter()
         .filter_map(|item| {
             if item.1.template_id.starts_with("AthenaCharacter") {
-                Some(item.1.template_id.split(":").nth(1)?.to_string())
+                Some(
+                    item.1
+                        .template_id
+                        .split(":")
+                        .nth(1)?
+                        .to_string()
+                        .to_lowercase(),
+                )
             } else {
                 None
             }
-        });
+        })
+        .collect();
 
     let items = items
         .into_iter()
-        .filter(|item| {
-            owned_outfits
-                .clone()
-                .any(|outfit| outfit == item.id.to_lowercase())
-        })
+        .filter(|item| owned_outfits.contains(&item.id.to_lowercase()))
         .collect::<Vec<fortnite_api_io::models::items::Item>>();
+
+    log_elapsed_time("Parsed locker", start);
 
     items
 }
