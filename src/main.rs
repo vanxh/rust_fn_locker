@@ -7,35 +7,18 @@ mod fortnite_api_io;
 
 #[tokio::main]
 async fn main() {
-    log_memory_usage();
-
     let start = Instant::now();
     dotenvy::dotenv().expect("❌ Failed to read .env file");
     log_elapsed_time("Loaded .env file", start);
-
-    log_memory_usage();
 
     let start = Instant::now();
     let fortnite_io_api_key = env::var("FORTNITE_IO_API_KEY").expect("FORTNITE_IO_API_KEY not set");
     let fortnite_api_io = fortnite_api_io::FortniteApiIo::new(fortnite_io_api_key);
     log_elapsed_time("Created FortniteApiIo struct", start);
 
-    log_memory_usage();
-
-    let start = Instant::now();
-    let items = match fortnite_api_io.get_items("/v2/items/list").await {
-        Ok(items) => items,
-        Err(err) => panic!("❌ Failed to get items list: {:?}", err),
-    };
-    log_elapsed_time(&format!("Got {} items list", { &items.len() }), start);
-
-    log_memory_usage();
-
     let start = Instant::now();
     let mut fortnite_api = fortnite_api::FortniteAPI::new();
     log_elapsed_time("Created FortniteAPI struct", start);
-
-    log_memory_usage();
 
     let start = Instant::now();
     if fortnite_api.session.is_none() {
@@ -49,41 +32,9 @@ async fn main() {
         start,
     );
 
-    log_memory_usage();
-
     let start = Instant::now();
-    let athena_profile = match fortnite_api.get_athena_profile().await {
-        Ok(profile) => profile,
-        Err(err) => panic!("❌ Failed to get athena profile: {:?}", err),
-    };
-    log_elapsed_time("Got athena profile", start);
-
-    log_memory_usage();
-
-    let owned_outfits = athena_profile.profile_changes[0]
-        .profile
-        .items
-        .iter()
-        .filter(|item| item.1.template_id.starts_with("AthenaCharacter"))
-        .map(|item| {
-            item.1
-                .template_id
-                .clone()
-                .to_lowercase()
-                .split(":")
-                .collect::<Vec<&str>>()[1]
-                .to_string()
-        })
-        .collect::<Vec<String>>();
-
-    let items = items
-        .iter()
-        .filter(|item| owned_outfits.contains(&item.id.to_lowercase()))
-        .collect::<Vec<&fortnite_api_io::models::items::Item>>();
-
-    log_elapsed_time(&format!("Got {} owned outfits", items.len()), start);
-
-    log_memory_usage();
+    let items = get_locker(fortnite_api, fortnite_api_io).await;
+    log_elapsed_time(&format!("Got {} owned outfits", &items.len()), start);
 }
 
 async fn fortnite_login(fortnite_api: &mut fortnite_api::FortniteAPI) {
@@ -129,16 +80,59 @@ async fn fortnite_login(fortnite_api: &mut fortnite_api::FortniteAPI) {
     }
 }
 
-fn log_memory_usage() {
+async fn get_locker(
+    fortnite_api: fortnite_api::FortniteAPI,
+    fortnite_api_io: fortnite_api_io::FortniteApiIo,
+) -> Vec<fortnite_api_io::models::items::Item> {
+    let start = Instant::now();
+    let items = match fortnite_api_io.get_items("/v2/items/list").await {
+        Ok(items) => items,
+        Err(err) => panic!("❌ Failed to get items list: {:?}", err),
+    };
+    log_elapsed_time(&format!("Got {} items list", { &items.len() }), start);
+
+    let start = Instant::now();
+    let athena_profile = match fortnite_api.get_athena_profile().await {
+        Ok(profile) => profile,
+        Err(err) => panic!("❌ Failed to get athena profile: {:?}", err),
+    };
+    log_elapsed_time("Got athena profile", start);
+
+    let owned_outfits = athena_profile.profile_changes[0]
+        .profile
+        .items
+        .iter()
+        .filter_map(|item| {
+            if item.1.template_id.starts_with("AthenaCharacter") {
+                Some(item.1.template_id.split(":").nth(1)?.to_string())
+            } else {
+                None
+            }
+        });
+
+    let items = items
+        .into_iter()
+        .filter(|item| {
+            owned_outfits
+                .clone()
+                .any(|outfit| outfit == item.id.to_lowercase())
+        })
+        .collect::<Vec<fortnite_api_io::models::items::Item>>();
+
+    items
+}
+
+fn get_memory_usage() -> u64 {
     let process = psutil::process::Process::current().unwrap();
     let memory_info = process.memory_info().unwrap();
-    println!(
-        "🤯 Current process memory usage: {} MB",
-        memory_info.rss() / 1024 / 1024
-    );
+
+    let memory_usage = memory_info.rss() / 1024 / 1024;
+
+    memory_usage
 }
 
 fn log_elapsed_time(message: &str, start_time: Instant) {
     let elapsed = start_time.elapsed();
-    println!("✅ {} in {:?}", message, elapsed);
+    let memory_usage = get_memory_usage();
+    println!("✅ {} in {:?} [{} MB]", message, elapsed, memory_usage);
 }
