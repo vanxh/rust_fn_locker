@@ -11,6 +11,7 @@ use std::time::Instant;
 
 pub struct FortniteAPI {
     pub session: Option<Session>,
+    client: reqwest::Client,
 }
 
 impl FortniteAPI {
@@ -20,12 +21,16 @@ impl FortniteAPI {
                 if !session.is_expired() {
                     return FortniteAPI {
                         session: Some(session),
+                        client: reqwest::Client::new(),
                     };
                 }
             }
         }
 
-        FortniteAPI { session: None }
+        FortniteAPI {
+            session: None,
+            client: reqwest::Client::new(),
+        }
     }
 
     pub fn save_session(&self) -> io::Result<()> {
@@ -48,9 +53,8 @@ impl FortniteAPI {
     ) -> Result<String, Box<dyn std::error::Error>> {
         let url = "https://account-public-service-prod.ol.epicgames.com/account/api/oauth/token";
 
-        let client = reqwest::Client::new();
-
-        let resp = client
+        let resp = self
+            .client
             .post(url)
             .header("Content-Type", "application/x-www-form-urlencoded")
             .header("Authorization", format!("basic {}", token))
@@ -82,9 +86,8 @@ impl FortniteAPI {
     ) -> Result<GetDeviceAuthorizationResponse, Box<dyn std::error::Error>> {
         let url = "https://account-public-service-prod.ol.epicgames.com/account/api/oauth/deviceAuthorization";
 
-        let client = reqwest::Client::new();
-
-        let resp = client
+        let resp = self
+            .client
             .post(url)
             .header("Content-Type", "application/x-www-form-urlencoded")
             .bearer_auth(token)
@@ -103,9 +106,8 @@ impl FortniteAPI {
         let session = self.session.as_ref().unwrap();
         let url = format!("https://fortnite-public-service-prod11.ol.epicgames.com/fortnite/api/game/v2/profile/{}/client/QueryProfile?profileId=athena", session.account_id);
 
-        let client = reqwest::Client::new();
-
-        let resp = client
+        let resp = self
+            .client
             .post(url)
             .header("Content-Type", "application/json")
             .bearer_auth(session.access_token.clone())
