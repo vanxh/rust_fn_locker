@@ -86,7 +86,7 @@ async fn get_locker(
     fortnite_api_io: fortnite_api_io::FortniteApiIo,
 ) -> Vec<fortnite_api_io::models::items::Item> {
     let start = Instant::now();
-    let items = match fortnite_api_io.get_items("/v2/items/list").await {
+    let items = match fortnite_api_io.get_items().await {
         Ok(items) => items,
         Err(err) => panic!("❌ Failed to get items list: {:?}", err),
     };

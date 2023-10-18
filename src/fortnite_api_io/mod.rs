@@ -17,8 +17,8 @@ impl FortniteApiIo {
         }
     }
 
-    pub async fn get_items(&self, url: &str) -> Result<Vec<Item>, Box<dyn std::error::Error>> {
-        let url = format!("{}{}", self.url, url);
+    pub async fn get_items(&self) -> Result<Vec<Item>, Box<dyn std::error::Error>> {
+        let url = format!("{}{}", self.url, "/v2/items/list");
 
         let resp = self
             .client
