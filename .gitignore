@@ -1,3 +1,4 @@
 /target
 .env
 session.json
+.DS_Store
