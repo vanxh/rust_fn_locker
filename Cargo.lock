@@ -991,6 +991,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "dotenvy",
+ "lazy_static",
  "psutil",
  "reqwest",
  "serde",

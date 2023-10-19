@@ -1,6 +1,3 @@
-extern crate psutil;
-extern crate skia_safe;
-
 mod fortnite_api;
 mod fortnite_api_io;
 mod fortnite_locker;

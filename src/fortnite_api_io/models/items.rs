@@ -1,5 +1,6 @@
 use serde::de::{self, Deserializer};
 use serde::{Deserialize, Serialize};
+use std::fmt;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GetItemsResponse {
@@ -29,6 +30,20 @@ pub enum Rarity {
     Epic,
     Legendary,
     Exotic,
+}
+
+impl fmt::Display for Rarity {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let rarity_str = match *self {
+            Rarity::Common => "Common",
+            Rarity::Uncommon => "Uncommon",
+            Rarity::Rare => "Rare",
+            Rarity::Epic => "Epic",
+            Rarity::Legendary => "Legendary",
+            Rarity::Exotic => "Exotic",
+        };
+        write!(f, "{}", rarity_str)
+    }
 }
 
 impl<'de> Deserialize<'de> for Rarity {
@@ -79,6 +94,32 @@ pub enum ItemType {
     Bundle,
     BattleBus,
     ItemAccess,
+}
+
+impl fmt::Display for ItemType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let item_type_str = match *self {
+            ItemType::Backpack => "Backpack",
+            ItemType::Outfit => "Outfit",
+            ItemType::Contrail => "Contrail",
+            ItemType::Emote => "Emote",
+            ItemType::Glider => "Glider",
+            ItemType::LoadingScreen => "Loading Screen",
+            ItemType::Music => "Music",
+            ItemType::Pet => "Pet",
+            ItemType::Pickaxe => "Pickaxe",
+            ItemType::Spray => "Spray",
+            ItemType::Toy => "Toy",
+            ItemType::Banner => "Banner",
+            ItemType::Emoji => "Emoji",
+            ItemType::Wrap => "Wrap",
+            ItemType::Style => "Style",
+            ItemType::Bundle => "Bundle",
+            ItemType::BattleBus => "Battle Bus",
+            ItemType::ItemAccess => "Item Access",
+        };
+        write!(f, "{}", item_type_str)
+    }
 }
 
 impl<'de> Deserialize<'de> for ItemType {
