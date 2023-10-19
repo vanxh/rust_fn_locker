@@ -40,7 +40,7 @@ impl FortniteLocker {
             return image.ok_or_else(|| "Failed to decode image".into());
         }
 
-        let mut surface = surfaces::raster_n32_premul((500, 530)).unwrap();
+        let mut surface = surfaces::raster_n32_premul((250, 265)).unwrap();
         let canvas = surface.canvas();
 
         let (background, overlay) = if let Some(series) = &*item.series {
@@ -120,7 +120,7 @@ impl FortniteLocker {
         let item_image_url: &str = item.images.icon.as_ref().unwrap();
         let item_image = Self::fetch_image(item_image_url).await.unwrap();
 
-        let dest_rect = Rect::from_xywh(0.0, 0.0 - 530.0 * 0.05, 530.0 * 0.9, 530.0 * 0.9);
+        let dest_rect = Rect::from_xywh(0.0, 0.0 - 265.0 * 0.05, 265.0 * 0.9, 265.0 * 0.9);
         let mut paint = Paint::default();
         paint.set_anti_alias(true);
         canvas.draw_image_rect(&item_image, None, &dest_rect, &paint);
