@@ -381,7 +381,7 @@ impl FortniteLocker {
         }
 
         let image_data = surface.image_snapshot();
-        let png_data_option = encode::image(None, &image_data, EncodedImageFormat::PNG, Some(100));
+        let png_data_option = encode::image(None, &image_data, EncodedImageFormat::JPEG, Some(100));
 
         match png_data_option {
             Some(png_data) => {

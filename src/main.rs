@@ -48,9 +48,9 @@ async fn main() {
     let start = Instant::now();
     let locker = fortnite_locker::FortniteLocker::new(250.0, 265.0);
     let locker_img = locker.generate_locker(items).await;
-    let mut file = fs::File::create("locker.png").expect("❌ Failed to create locker.png");
+    let mut file = fs::File::create("locker.jpeg").expect("❌ Failed to create locker.jpeg");
     file.write_all(&locker_img)
-        .expect("❌ Failed to write locker.png");
+        .expect("❌ Failed to write locker.jpeg");
     log_elapsed_time("Generated locker image", start);
 }
 
