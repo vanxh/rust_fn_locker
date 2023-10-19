@@ -346,7 +346,6 @@ impl FortniteLocker {
     }
 
     pub async fn generate_locker(&self, items: Vec<Item>) -> Vec<u8> {
-        // Result<skia_safe::Image, Box<dyn std::error::Error>>
         let gap = 30.0;
 
         let rendered_length = (items.len() as f32).sqrt().ceil() as i32;
