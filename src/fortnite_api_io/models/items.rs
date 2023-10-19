@@ -17,8 +17,7 @@ pub struct Item {
     pub rarity: Rarity,
     pub series: Box<Option<Series>>,
     pub price: u16,
-    #[serde(rename = "images")]
-    pub icon: Images,
+    pub images: Images,
 }
 
 #[derive(Serialize, Debug)]
@@ -201,26 +200,7 @@ struct Added {
     version: String,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Images {
-    icon: Option<String>,
-}
-
-impl<'de> Deserialize<'de> for Images {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let helper: serde_json::Value = Deserialize::deserialize(deserializer)?;
-        if let Some(map) = helper.as_object() {
-            if let Some(icon) = map.get("icon") {
-                if let Some(icon_str) = icon.as_str() {
-                    return Ok(Images {
-                        icon: Some(icon_str.to_string()),
-                    });
-                }
-            }
-        }
-        Ok(Images { icon: None })
-    }
+    pub icon: Option<String>,
 }

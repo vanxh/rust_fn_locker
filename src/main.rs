@@ -1,12 +1,16 @@
+extern crate psutil;
+extern crate skia_safe;
+
+mod fortnite_api;
+mod fortnite_api_io;
+mod fortnite_locker;
+
 use std::collections::HashSet;
 use std::env;
 use std::fs;
 use std::path::Path;
 use std::time::Instant;
-extern crate psutil;
-
-mod fortnite_api;
-mod fortnite_api_io;
+use tokio;
 
 #[tokio::main]
 async fn main() {
@@ -42,6 +46,12 @@ async fn main() {
     let start = Instant::now();
     let items = get_locker(fortnite_api, fortnite_api_io).await;
     log_elapsed_time(&format!("Got {} owned outfits", &items.len()), start);
+
+    let start = Instant::now();
+    fortnite_locker::FortniteLocker::get_item_img(&items[15])
+        .await
+        .unwrap();
+    log_elapsed_time("Generated outfit image", start);
 }
 
 async fn fortnite_login(fortnite_api: &mut fortnite_api::FortniteAPI) {
