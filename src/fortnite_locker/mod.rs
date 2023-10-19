@@ -361,6 +361,9 @@ impl FortniteLocker {
         let mut surface = surfaces::raster_n32_premul((c_x as i32, c_y as i32)).unwrap();
         let canvas = surface.canvas();
 
+        let mut paint = Paint::default();
+        paint.set_anti_alias(true);
+
         for (i, item) in items.iter().enumerate() {
             let x = (i as i32 % rendered_length) as f32 * (self.item_width + gap) + gap;
             let y = (i as i32 / rendered_length) as f32 * (self.item_height + gap) + gap;
@@ -373,8 +376,7 @@ impl FortniteLocker {
                 self.item_width * 0.9,
                 self.item_height * 0.9,
             );
-            let mut paint = Paint::default();
-            paint.set_anti_alias(true);
+
             canvas.draw_image_rect(item_image, None, &dest_rect, &paint);
         }
 
@@ -383,7 +385,6 @@ impl FortniteLocker {
 
         match png_data_option {
             Some(png_data) => {
-                // Convert SkData to Vec<u8>
                 let bytes: Vec<u8> = png_data.as_bytes().to_vec();
                 bytes
             }
