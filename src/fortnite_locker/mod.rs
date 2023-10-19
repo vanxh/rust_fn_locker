@@ -18,6 +18,126 @@ lazy_static! {
     static ref TYPEFACE: Typeface = Typeface::from_data(Data::new_copy(&FONT_DATA), None)
         .expect("Failed to create typeface")
         .into();
+    static ref MARVEL_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/Marvel.png").unwrap()
+    ))
+    .unwrap();
+    static ref MARVEL_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/Marvel.png").unwrap()
+    ))
+    .unwrap();
+    static ref CREATOR_COLLAB_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/Icon.png").unwrap()
+    ))
+    .unwrap();
+    static ref CREATOR_COLLAB_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/Icon.png").unwrap()
+    ))
+    .unwrap();
+    static ref DCU_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/DC.png").unwrap()
+    ))
+    .unwrap();
+    static ref DCU_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/DC.png").unwrap()
+    ))
+    .unwrap();
+    static ref SHADOW_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/Shadow.png").unwrap()
+    ))
+    .unwrap();
+    static ref SHADOW_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/Shadow.png").unwrap()
+    ))
+    .unwrap();
+    static ref SLURP_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/Slurp.png").unwrap()
+    ))
+    .unwrap();
+    static ref SLURP_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/Slurp.png").unwrap()
+    ))
+    .unwrap();
+    static ref LAVA_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/Lava.png").unwrap()
+    ))
+    .unwrap();
+    static ref LAVA_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/Lava.png").unwrap()
+    ))
+    .unwrap();
+    static ref FRONZEN_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/Frozen.png").unwrap()
+    ))
+    .unwrap();
+    static ref FRONZEN_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/Frozen.png").unwrap()
+    ))
+    .unwrap();
+    static ref GAMING_LEGENDS_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/GamingLegends.png").unwrap()
+    ))
+    .unwrap();
+    static ref GAMING_LEGENDS_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/GamingLegends.png").unwrap()
+    ))
+    .unwrap();
+    static ref COLUMBUS_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/StarWars.png").unwrap()
+    ))
+    .unwrap();
+    static ref COLUMBUS_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/StarWars.png").unwrap()
+    ))
+    .unwrap();
+    static ref CUBE_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/Dark.png").unwrap()
+    ))
+    .unwrap();
+    static ref CUBE_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/Dark.png").unwrap()
+    ))
+    .unwrap();
+    static ref COMMON_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/Common.png").unwrap()
+    ))
+    .unwrap();
+    static ref COMMON_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/Common.png").unwrap()
+    ))
+    .unwrap();
+    static ref UNCOMMON_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/Uncommon.png").unwrap()
+    ))
+    .unwrap();
+    static ref UNCOMMON_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/Uncommon.png").unwrap()
+    ))
+    .unwrap();
+    static ref RARE_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/Rare.png").unwrap()
+    ))
+    .unwrap();
+    static ref RARE_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/Rare.png").unwrap()
+    ))
+    .unwrap();
+    static ref EPIC_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/Epic.png").unwrap()
+    ))
+    .unwrap();
+    static ref EPIC_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/Epic.png").unwrap()
+    ))
+    .unwrap();
+    static ref LEGENDARY_BACKGROUND: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/backgrounds/Legendary.png").unwrap()
+    ))
+    .unwrap();
+    static ref LEGENDARY_OVERLAY: Image = Image::from_encoded(Data::new_copy(
+        &fs::read("./assets/locker/overlays/Legendary.png").unwrap()
+    ))
+    .unwrap();
 }
 
 pub struct FortniteLocker;
@@ -54,92 +174,92 @@ impl FortniteLocker {
         let (background, overlay, color) = if let Some(series) = &*item.series {
             match series {
                 Series::MarvelSeries => (
-                    Self::fetch_image("./assets/locker/backgrounds/Marvel.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/Marvel.png").await?,
+                    MARVEL_BACKGROUND.clone(),
+                    MARVEL_OVERLAY.clone(),
                     Color::from_argb(255, 168, 53, 56),
                 ),
                 Series::CreatorCollabSeries => (
-                    Self::fetch_image("./assets/locker/backgrounds/Icon.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/Icon.png").await?,
+                    CREATOR_COLLAB_BACKGROUND.clone(),
+                    CREATOR_COLLAB_OVERLAY.clone(),
                     Color::from_argb(255, 43, 134, 135),
                 ),
                 Series::DCUSeries => (
-                    Self::fetch_image("./assets/locker/backgrounds/DC.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/DC.png").await?,
+                    DCU_BACKGROUND.clone(),
+                    DCU_OVERLAY.clone(),
                     Color::from_argb(255, 80, 97, 122),
                 ),
                 Series::ShadowSeries => (
-                    Self::fetch_image("./assets/locker/backgrounds/Shadow.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/Shadow.png").await?,
+                    SHADOW_BACKGROUND.clone(),
+                    SHADOW_OVERLAY.clone(),
                     Color::from_argb(255, 66, 64, 63),
                 ),
                 Series::SlurpSeries => (
-                    Self::fetch_image("./assets/locker/backgrounds/Slurp.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/Slurp.png").await?,
+                    SLURP_BACKGROUND.clone(),
+                    SLURP_OVERLAY.clone(),
                     Color::from_argb(255, 0, 233, 176),
                 ),
                 Series::LavaSeries => (
-                    Self::fetch_image("./assets/locker/backgrounds/Lava.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/Lava.png").await?,
+                    LAVA_BACKGROUND.clone(),
+                    LAVA_OVERLAY.clone(),
                     Color::from_argb(255, 185, 102, 100),
                 ),
                 Series::FrozenSeries => (
-                    Self::fetch_image("./assets/locker/backgrounds/Frozen.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/Frozen.png").await?,
+                    FRONZEN_BACKGROUND.clone(),
+                    FRONZEN_OVERLAY.clone(),
                     Color::from_argb(255, 148, 215, 244),
                 ),
                 Series::PlatformSeries => (
-                    Self::fetch_image("./assets/locker/backgrounds/GamingLegends.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/GamingLegends.png").await?,
+                    GAMING_LEGENDS_BACKGROUND.clone(),
+                    GAMING_LEGENDS_OVERLAY.clone(),
                     Color::from_argb(255, 117, 108, 235),
                 ),
                 Series::ColumbusSeries => (
-                    Self::fetch_image("./assets/locker/backgrounds/StarWars.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/StarWars.png").await?,
+                    COLUMBUS_BACKGROUND.clone(),
+                    COLUMBUS_OVERLAY.clone(),
                     Color::from_argb(255, 231, 196, 19),
                 ),
                 Series::CUBESeries => (
-                    Self::fetch_image("./assets/locker/backgrounds/Dark.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/Dark.png").await?,
+                    CUBE_BACKGROUND.clone(),
+                    CUBE_OVERLAY.clone(),
                     Color::from_argb(255, 179, 62, 187),
                 ),
             }
         } else {
             match item.rarity {
                 Rarity::Common => (
-                    Self::fetch_image("./assets/locker/backgrounds/Common.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/Common.png").await?,
+                    COMMON_BACKGROUND.clone(),
+                    COMMON_OVERLAY.clone(),
                     Color::from_argb(255, 96, 170, 58),
                 ),
                 Rarity::Uncommon => (
-                    Self::fetch_image("./assets/locker/backgrounds/Uncommon.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/Uncommon.png").await?,
+                    UNCOMMON_BACKGROUND.clone(),
+                    UNCOMMON_OVERLAY.clone(),
                     Color::from_argb(255, 96, 170, 58),
                 ),
                 Rarity::Rare => (
-                    Self::fetch_image("./assets/locker/backgrounds/Rare.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/Rare.png").await?,
+                    RARE_BACKGROUND.clone(),
+                    RARE_OVERLAY.clone(),
                     Color::from_argb(255, 73, 172, 242),
                 ),
                 Rarity::Epic => (
-                    Self::fetch_image("./assets/locker/backgrounds/Epic.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/Epic.png").await?,
+                    EPIC_BACKGROUND.clone(),
+                    EPIC_OVERLAY.clone(),
                     Color::from_argb(255, 177, 91, 226),
                 ),
                 Rarity::Legendary => (
-                    Self::fetch_image("./assets/locker/backgrounds/Legendary.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/Legendary.png").await?,
+                    LEGENDARY_BACKGROUND.clone(),
+                    LEGENDARY_OVERLAY.clone(),
                     Color::from_argb(255, 211, 120, 65),
                 ),
                 _ => (
-                    Self::fetch_image("./assets/locker/backgrounds/Common.png").await?,
-                    Self::fetch_image("./assets/locker/overlays/Common.png").await?,
+                    COMMON_BACKGROUND.clone(),
+                    COMMON_OVERLAY.clone(),
                     Color::from_argb(255, 96, 170, 58),
                 ),
             }
         };
 
-        canvas.draw_image(&background, (0, 0), Some(&Paint::default()));
+        canvas.draw_image(background, (0, 0), Some(&Paint::default()));
 
         let item_image_url: &str = item.images.icon.as_ref().unwrap();
         let item_image = Self::fetch_image(item_image_url).await.unwrap();
@@ -147,9 +267,9 @@ impl FortniteLocker {
         let dest_rect = Rect::from_xywh(0.0, 0.0 - 265.0 * 0.05, 265.0 * 0.9, 265.0 * 0.9);
         let mut paint = Paint::default();
         paint.set_anti_alias(true);
-        canvas.draw_image_rect(&item_image, None, &dest_rect, &paint);
+        canvas.draw_image_rect(item_image, None, &dest_rect, &paint);
 
-        canvas.draw_image(&overlay, (0, 0), Some(&Paint::default()));
+        canvas.draw_image(overlay, (0, 0), Some(&Paint::default()));
 
         let mut font = Font::default();
         font.set_size(265.0 * 0.1);
