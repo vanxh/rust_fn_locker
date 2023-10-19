@@ -140,9 +140,19 @@ lazy_static! {
     .unwrap();
 }
 
-pub struct FortniteLocker;
+pub struct FortniteLocker {
+    item_width: f32,
+    item_height: f32,
+}
 
 impl FortniteLocker {
+    pub fn new(item_width: f32, item_height: f32) -> Self {
+        Self {
+            item_width,
+            item_height,
+        }
+    }
+
     async fn fetch_image(url: &str) -> Result<skia_safe::Image, Box<dyn std::error::Error>> {
         if Path::new(url).exists() {
             let file_data = fs::read(url);
@@ -158,7 +168,10 @@ impl FortniteLocker {
         image.ok_or_else(|| "Failed to decode image".into())
     }
 
-    pub async fn get_item_img(item: &Item) -> Result<skia_safe::Image, Box<dyn std::error::Error>> {
+    pub async fn get_item_img(
+        &self,
+        item: &Item,
+    ) -> Result<skia_safe::Image, Box<dyn std::error::Error>> {
         let output = format!(".rust_fn_locker/{}.png", item.id.to_lowercase());
 
         if (Path::new(&output)).exists() {
@@ -168,7 +181,8 @@ impl FortniteLocker {
             return image.ok_or_else(|| "Failed to decode image".into());
         }
 
-        let mut surface = surfaces::raster_n32_premul((250, 265)).unwrap();
+        let mut surface =
+            surfaces::raster_n32_premul((self.item_width as i32, self.item_height as i32)).unwrap();
         let canvas = surface.canvas();
 
         let (background, overlay, color) = if let Some(series) = &*item.series {
@@ -276,7 +290,7 @@ impl FortniteLocker {
         font.set_typeface(TYPEFACE.clone());
 
         let mut text_width = font.measure_str(&item.name.to_uppercase(), None).0;
-        while text_width > 250.0 * 0.9 {
+        while text_width > self.item_width * 0.9 {
             font.set_size(font.size() - 1.0);
             text_width = font.measure_str(&item.name.to_uppercase(), None).0;
         }
@@ -285,7 +299,7 @@ impl FortniteLocker {
         paint.set_color(skia_safe::Color::WHITE);
         canvas.draw_str(
             &item.name.to_uppercase(),
-            ((250.0 / 2.0) - (text_width / 2.0), 265.0 * 0.825),
+            ((self.item_width / 2.0) - (text_width / 2.0), 265.0 * 0.825),
             &font,
             &paint,
         );
@@ -302,14 +316,17 @@ impl FortniteLocker {
         paint.set_color(color);
 
         let mut text_width = font.measure_str(&rarity_text, None).0;
-        while text_width > 250.0 * 0.9 {
+        while text_width > self.item_width * 0.9 {
             font.set_size(font.size() - 1.0);
             text_width = font.measure_str(&rarity_text, None).0;
         }
 
         canvas.draw_str(
             &rarity_text,
-            ((250.0 / 2.0) - (text_width / 2.0), 265.0 * 0.91),
+            (
+                (self.item_width / 2.0) - (text_width / 2.0),
+                self.item_height * 0.91,
+            ),
             &font,
             &paint,
         );
@@ -326,5 +343,54 @@ impl FortniteLocker {
         let image = Image::from_encoded(image_data);
 
         image.ok_or_else(|| "Failed to decode image".into())
+    }
+
+    pub async fn generate_locker(&self, items: Vec<Item>) -> Vec<u8> {
+        // Result<skia_safe::Image, Box<dyn std::error::Error>>
+        let gap = 30.0;
+
+        let rendered_length = (items.len() as f32).sqrt().ceil() as i32;
+
+        let c_x = self.item_width * rendered_length as f32 + gap + rendered_length as f32 * gap;
+        let header_scale = c_x / 2000.0;
+        let c_y = self.item_height * (items.len() as f32 / rendered_length as f32).ceil()
+            + gap
+            + rendered_length as f32 * gap
+            + header_scale * 128.0
+            + header_scale * 80.0;
+
+        let mut surface = surfaces::raster_n32_premul((c_x as i32, c_y as i32)).unwrap();
+        let canvas = surface.canvas();
+
+        for (i, item) in items.iter().enumerate() {
+            let x = (i as i32 % rendered_length) as f32 * (self.item_width + gap) + gap;
+            let y = (i as i32 / rendered_length) as f32 * (self.item_height + gap) + gap;
+
+            let item_image = self.get_item_img(item).await.unwrap();
+
+            let dest_rect = Rect::from_xywh(
+                x + (self.item_width * 0.05),
+                y + (self.item_height * 0.05),
+                self.item_width * 0.9,
+                self.item_height * 0.9,
+            );
+            let mut paint = Paint::default();
+            paint.set_anti_alias(true);
+            canvas.draw_image_rect(item_image, None, &dest_rect, &paint);
+        }
+
+        let image_data = surface.image_snapshot();
+        let png_data_option = encode::image(None, &image_data, EncodedImageFormat::PNG, Some(100));
+
+        match png_data_option {
+            Some(png_data) => {
+                // Convert SkData to Vec<u8>
+                let bytes: Vec<u8> = png_data.as_bytes().to_vec();
+                bytes
+            }
+            None => {
+                panic!("Failed to encode image");
+            }
+        }
     }
 }

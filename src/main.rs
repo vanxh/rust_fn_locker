@@ -5,6 +5,7 @@ mod fortnite_locker;
 use std::collections::HashSet;
 use std::env;
 use std::fs;
+use std::io::Write;
 use std::path::Path;
 use std::time::Instant;
 use tokio;
@@ -45,10 +46,12 @@ async fn main() {
     log_elapsed_time(&format!("Got {} owned outfits", &items.len()), start);
 
     let start = Instant::now();
-    fortnite_locker::FortniteLocker::get_item_img(&items[15])
-        .await
-        .unwrap();
-    log_elapsed_time("Generated outfit image", start);
+    let locker = fortnite_locker::FortniteLocker::new(250.0, 265.0);
+    let locker_img = locker.generate_locker(items).await;
+    let mut file = fs::File::create("locker.png").expect("❌ Failed to create locker.png");
+    file.write_all(&locker_img)
+        .expect("❌ Failed to write locker.png");
+    log_elapsed_time("Generated locker image", start);
 }
 
 async fn fortnite_login(fortnite_api: &mut fortnite_api::FortniteAPI) {
